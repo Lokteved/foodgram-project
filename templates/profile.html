@@ -1,0 +1,44 @@
+{% extends "base.html" %} 
+{% block title %}Рецепты пользователя {{author.first_name}} {{author.last_name}} | Продуктовый помощник{% endblock %}
+{% load user_filters %}
+{% load recipe_filter %}
+{% load static %}
+{% block style %} <link rel="stylesheet" href={% static "/pages/index.css" %}>{% endblock %}
+{% block nav %}{% include 'nav.html'%}{% endblock %}
+{% block content %}
+{% csrf_token %}
+    <main class="main container">
+        <div class="main__header">
+            <h1 class="main__title">{{author.first_name}} {{author.last_name}}</h1>
+            {% include 'tags_block.html' %}
+        </div>
+    {% if request.user.is_authenticated and request.user !=  author %}
+    <div class="author-subscribe" data-author="{{ user.id }}">
+        <p style="padding: 0 0 2em 0;">
+            <button class="button button_style_light-blue button_size_subscribe" name="subscribe"
+            {% if not following %}data-out>Подписаться на автора {% else %}>
+            <span class="icon-check button__icon"></span> Отписаться{% endif %}</button>
+        </p>
+    </div>
+    {% endif %}
+        <div class="card-list" >
+            {% for recipe in page %}
+            {% include "recipe_card.html" with recipe=recipe %}
+            {% endfor %}
+        </div>
+        {% if page.has_other_pages %}
+            {% include 'paginator.html' %}   
+        {% endif %}
+    </main>
+{% endblock %}
+{% block script %}
+    <script src="{% static '/js/components/MainCards.js' %}"></script>
+    <script src="{% static '/js/components/Purchases.js' %}"></script>
+    <script src="{% static '/js/components/Favorites.js' %}"></script>
+    <script src="{% static '/js/components/Subscribe.js' %}"></script>
+    <script src="{% static '/js/config/config.js' %}"></script>
+    <script src="{% static '/js/components/AuthorRecipe.js' %}"></script>
+    <script src="{% static '/js/components/Header.js' %}"></script>
+    <script src="{% static '/js/api/Api.js' %}"></script>
+    <script src="{% static 'authorRecipe.js' %}"></script>
+{% endblock %}

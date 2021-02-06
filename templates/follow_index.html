@@ -1,0 +1,58 @@
+{% extends "base.html" %} 
+{% block title %} Мои подписки {% endblock %}
+{% load static %}
+{% block style %} <link rel="stylesheet" href={% static "/pages/myFollow.css" %}>{% endblock %}
+{% block nav %}{% include 'nav.html' with follows_index=True %}{% endblock %}
+{% block content %}
+{% csrf_token %}
+<div class="main__header">
+    <h1 class="main__title">Мои подписки</h1>
+</div>
+<div class="card-list">
+    {% for author in page %}
+    <div class="card-user" data-author="{{ author.id }}">
+    <div class="card-user__header">
+        <h2 class="card-user__title">{{ author }}</h2>
+    </div>
+    <div class="card-user__body">
+        <ul class="card-user__items">
+            {% for recipe in author.recipes.all %}
+            {% if forloop.counter < 4 %}
+            <li class="card-user__item">
+                <div class="recipe">
+                    {% if recipe.image %}
+                    <img src="{{ recipe.image.url }}" alt="фото {{ recipe.title }}" class="recipe__image">
+                    {% endif %}
+                    <h3 class="recipe__title">{{ recipe.title }}</h3>
+                    <p class="recipe__text"><span class="icon-time"></span> {{ recipe.cooking_time }} мин.</p>
+                </div>
+            </li>
+            {% endif %}
+            {% endfor %}
+            {% if forloop.counter > 3 %}
+            <li class="card-user__item">
+                <a href="{% url 'profile' author.username %}" class="card-user__link link">Еще рецептов {{ subscriptions_recipes.count|add:-3 }}</a>
+            </li>
+            {% endif %}
+        </ul>
+    </div>
+    <div class="card-user__footer">
+        <button class="button button_style_light-blue button_size_auto" name="subscribe">Отписаться</button>
+    </div>
+    </div>
+    {% endfor %}
+</div>
+{% if page.has_other_pages %}
+    {% include 'paginator.html' %}   
+{% endif %}
+</main>
+{% endblock %}
+{% block script %}
+<script src="{% static '/js/config/config.js' %}"></script>
+<script src="{% static 'js/components/MainCards.js' %}"></script>
+<script src="{% static '/js/components/MyFollow.js' %}"></script>
+<script src="{% static 'js/components/Subscribe.js' %}"></script>
+<script src="{% static 'js/components/Header.js' %}"></script>
+<script src="{% static 'js/api/Api.js' %}"></script>
+<script src="{% static 'myFollow.js' %}"></script>
+{% endblock %}
