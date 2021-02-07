@@ -7,7 +7,7 @@ from django.http import HttpResponse
 from django.views import View
 
 from .forms import RecipeForm
-from .models import Recipe, IngredientRecipe, Ingredient, Tag, FollowUser, FollowRecipe, ShoppingList
+from .models import Recipe, IngredientRecipe, Ingredient, ShoppingList
 from .services import (
     get_ingredients,
     get_ingredients_names,
@@ -15,6 +15,7 @@ from .services import (
     assembly_ingredients,
     get_fav_list,
     get_shopping_list,
+    get_follows_list,
     create_shopping_list
 )
 
@@ -45,6 +46,7 @@ def index(request):
             'shopping_list': shopping_list
         }
     )
+
 
 @login_required
 def new_recipe(request):
@@ -91,7 +93,7 @@ class RecipeEdit(LoginRequiredMixin, View):
         if request.user != recipe.author:
             return redirect('recipe', recipe_id=recipe.id)
 
-        ingredients = recipe.ingredients.all()
+        ingredients = recipe.recipe_ingredients.all()
         form = RecipeForm(request.POST, request.FILES, instance=recipe)
         ingredients_names = get_ingredients_names(request)
         ingredients_values = get_ingredients_values(request)
@@ -108,6 +110,7 @@ class RecipeEdit(LoginRequiredMixin, View):
 
         return redirect('recipe', recipe_id=recipe.id)
 
+
 class RecipeDelete(LoginRequiredMixin, View):
     def get(self, request, recipe_id):
         recipe = get_object_or_404(Recipe, id=recipe_id)
@@ -116,6 +119,7 @@ class RecipeDelete(LoginRequiredMixin, View):
 
         recipe.delete()
         return redirect('index')
+
 
 @login_required
 def favorite_index(request):
@@ -132,8 +136,7 @@ def favorite_index(request):
     favorites = get_fav_list(request)
     shopping_list = get_shopping_list(request)
 
-    return render(request, 'favorite_index.html',
-        {
+    return render(request, 'favorite_index.html', {
             'page': page,
             'paginator': paginator,
             'favorites': favorites,
@@ -141,17 +144,21 @@ def favorite_index(request):
         }
     )
 
+
 @login_required
 def follows_index(request):
     followed_authors = User.objects.filter(following__user=request.user)
+    follows_list = get_follows_list(request)
     paginator = Paginator(followed_authors, 3)
     page_number = request.GET.get('page')
     page = paginator.get_page(page_number)
-    return render(
-        request,
-        'follow_index.html',
-        context={'page': page, 'paginator': paginator}
+    return render(request, 'follow_index.html', context={
+            'page': page,
+            'paginator': paginator,
+            'follows_list': follows_list
+        }
     )
+
 
 @login_required
 def shopping_list(request):
@@ -163,6 +170,7 @@ def shopping_list(request):
         'shopping_list.html',
         context={'purchases': purchases}
     )
+
 
 @login_required
 def shopping_list_delete_item(request, recipe_id):
@@ -181,6 +189,7 @@ def shopping_list_delete_item(request, recipe_id):
         context={'purchases': purchases}
     )
 
+
 @login_required
 def download_shopping_list(request):
     result = create_shopping_list(request)
@@ -189,6 +198,7 @@ def download_shopping_list(request):
     response['Content-Disposition'] = 'attachment; filename={0}'.format(
         filename)
     return response
+
 
 def profile(request, username):
     tags_values = request.GET.getlist('filters')
@@ -220,6 +230,7 @@ def profile(request, username):
             'shopping_list': shopping_list
         }
     )
+
 
 def recipe_view(request, recipe_id):
     recipe = get_object_or_404(Recipe, id=recipe_id)

@@ -7,7 +7,7 @@ from django.views.decorators.http import require_http_methods
 from recipes.models import (
     Recipe,
     ShoppingList,
-    FollowRecipe,                                                 
+    FollowRecipe,
     FollowUser,
     Ingredient
 )
@@ -63,7 +63,7 @@ def unfollowing(request, author_id):
 def add_favorite_recipe(request):
     json_data = json.loads(request.body)
     favorites_obj, created = FollowRecipe.objects.get_or_create(
-        favorites_id=json_data.get('id'),
+        recipe_id=json_data.get('id'),
         user_id=request.user.id)
     if created:
         return JsonResponse({'success': True})
@@ -72,7 +72,7 @@ def add_favorite_recipe(request):
 
 @require_http_methods(["DELETE"])
 def remove_favorite_recipe(request, recipe_id):
-    num, deleted = get_object_or_404(FollowRecipe, favorites_id=recipe_id,
+    num, deleted = get_object_or_404(FollowRecipe, recipe_id=recipe_id,
                                      user_id=request.user.id).delete()
     if num != 0:
         return JsonResponse({'success': True})

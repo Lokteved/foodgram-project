@@ -1,5 +1,5 @@
 {% extends "base.html" %} 
-{% block title %} Мои подписки {% endblock %}
+{% block title %}Мои подписки | Продуктовый помощник{% endblock %}
 {% load static %}
 {% block style %} <link rel="stylesheet" href={% static "/pages/myFollow.css" %}>{% endblock %}
 {% block nav %}{% include 'nav.html' with follows_index=True %}{% endblock %}
@@ -12,7 +12,7 @@
     {% for author in page %}
     <div class="card-user" data-author="{{ author.id }}">
     <div class="card-user__header">
-        <h2 class="card-user__title">{{ author }}</h2>
+        <h2 class="card-user__title">{{author.first_name}} {{author.last_name}}</h2>
     </div>
     <div class="card-user__body">
         <ul class="card-user__items">
@@ -23,21 +23,23 @@
                     {% if recipe.image %}
                     <img src="{{ recipe.image.url }}" alt="фото {{ recipe.title }}" class="recipe__image">
                     {% endif %}
-                    <h3 class="recipe__title">{{ recipe.title }}</h3>
+                    <h3 class="recipe__title"><a class="card__title link" href={% url 'recipe' recipe.id %} target="_blank">{{ recipe.title }}</a></h3>
                     <p class="recipe__text"><span class="icon-time"></span> {{ recipe.cooking_time }} мин.</p>
                 </div>
             </li>
             {% endif %}
             {% endfor %}
-            {% if forloop.counter > 3 %}
+            {% if author.recipes.count > 3 %}
             <li class="card-user__item">
-                <a href="{% url 'profile' author.username %}" class="card-user__link link">Еще рецептов {{ subscriptions_recipes.count|add:-3 }}</a>
+                <a href="{% url 'profile' author.username %}" class="card-user__link link">Еще рецептов: {{ author.recipes.count|add:-3 }}</a>
             </li>
             {% endif %}
         </ul>
     </div>
     <div class="card-user__footer">
-        <button class="button button_style_light-blue button_size_auto" name="subscribe">Отписаться</button>
+        <button class="button button_style_light-blue button_size_subscribe" name="subscribe"
+            {% if author.id not in follows_list %}data-out>Подписаться на автора {% else %}>
+            <span class="icon-check button__icon"></span> Отписаться{% endif %}</button>
     </div>
     </div>
     {% endfor %}
@@ -49,10 +51,10 @@
 {% endblock %}
 {% block script %}
 <script src="{% static '/js/config/config.js' %}"></script>
+<script src="{% static 'js/api/Api.js' %}"></script>
+<script src="{% static 'js/components/Header.js' %}"></script>
 <script src="{% static 'js/components/MainCards.js' %}"></script>
 <script src="{% static '/js/components/MyFollow.js' %}"></script>
 <script src="{% static 'js/components/Subscribe.js' %}"></script>
-<script src="{% static 'js/components/Header.js' %}"></script>
-<script src="{% static 'js/api/Api.js' %}"></script>
 <script src="{% static 'myFollow.js' %}"></script>
 {% endblock %}

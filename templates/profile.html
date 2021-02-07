@@ -13,7 +13,7 @@
             {% include 'tags_block.html' %}
         </div>
     {% if request.user.is_authenticated and request.user !=  author %}
-    <div class="author-subscribe" data-author="{{ user.id }}">
+    <div class="author-subscribe" data-author="{{ author.id }}">
         <p style="padding: 0 0 2em 0;">
             <button class="button button_style_light-blue button_size_subscribe" name="subscribe"
             {% if not following %}data-out>Подписаться на автора {% else %}>

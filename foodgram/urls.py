@@ -3,7 +3,6 @@ from django.urls import include, path
 from django.conf import settings
 from django.conf.urls.static import static
 
-from . import views
 
 handler404 = 'foodgram.views.page_not_found'
 handler500 = 'foodgram.views.server_error'

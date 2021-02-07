@@ -34,7 +34,6 @@ class Tag(models.Model):
         return self.name
 
 
-
 class Recipe(models.Model):
     author = models.ForeignKey(
         User,
@@ -42,8 +41,8 @@ class Recipe(models.Model):
         related_name='recipes')
     title = models.CharField(max_length=200)
     image = models.ImageField(
-        upload_to='recipes/', 
-        blank=True, 
+        upload_to='recipes/',
+        blank=True,
         null=True)
     description = models.TextField()
     ingredients = models.ManyToManyField(
@@ -54,9 +53,9 @@ class Recipe(models.Model):
     tag = models.ManyToManyField(Tag, related_name='recipe_tag')
     cooking_time = models.IntegerField()
     pub_date = models.DateTimeField(
-        'date published', 
+        'date published',
         auto_now_add=True)
-    
+
     class Meta():
         ordering = ('-pub_date',)
 
@@ -66,7 +65,7 @@ class Recipe(models.Model):
 
 class IngredientRecipe(models.Model):
     recipe = models.ForeignKey(
-        Recipe, 
+        Recipe,
         on_delete=models.CASCADE,
         related_name='recipe_ingredients')
     ingredient = models.ForeignKey(
@@ -78,12 +77,12 @@ class IngredientRecipe(models.Model):
 
 class FollowRecipe(models.Model):
     user = models.ForeignKey(
-        User, 
-        on_delete=models.CASCADE, 
+        User,
+        on_delete=models.CASCADE,
         related_name='follower_recipe')
     recipe = models.ForeignKey(
-        Recipe, 
-        on_delete=models.CASCADE, 
+        Recipe,
+        on_delete=models.CASCADE,
         related_name='following_recipe')
 
     def __str__(self):
@@ -92,12 +91,12 @@ class FollowRecipe(models.Model):
 
 class FollowUser(models.Model):
     user = models.ForeignKey(
-        User, 
-        on_delete=models.CASCADE, 
+        User,
+        on_delete=models.CASCADE,
         related_name='follower')
     author = models.ForeignKey(
-        User, 
-        on_delete=models.CASCADE, 
+        User,
+        on_delete=models.CASCADE,
         related_name='following')
 
     def __str__(self):
@@ -106,10 +105,10 @@ class FollowUser(models.Model):
 
 class ShoppingList(models.Model):
     user = models.ForeignKey(
-        User, 
-        on_delete=models.CASCADE, 
+        User,
+        on_delete=models.CASCADE,
         related_name='user_shopping_list')
     recipe = models.ForeignKey(
-        Recipe, 
+        Recipe,
         on_delete=models.CASCADE,
         related_name='recipe_shopping_list')

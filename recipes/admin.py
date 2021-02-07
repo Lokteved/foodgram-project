@@ -47,4 +47,3 @@ admin.site.register(Ingredient, IngredientAdmin)
 admin.site.register(FollowUser, FollowUserAdmin)
 admin.site.register(FollowRecipe, FollowRecipeAdmin)
 admin.site.register(ShoppingList, ShoppingListAdmin)
-

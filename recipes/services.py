@@ -1,8 +1,13 @@
 import json
 
-from django.shortcuts import get_object_or_404
-
-from .models import IngredientRecipe, FollowRecipe, Ingredient, Recipe, ShoppingList
+from .models import (
+    IngredientRecipe,
+    FollowRecipe,
+    Ingredient,
+    Recipe,
+    ShoppingList,
+    FollowUser
+)
 
 
 def get_ingredients(request):
@@ -42,6 +47,14 @@ def get_fav_list(request):
     return fav_list
 
 
+def get_follows_list(request):
+    if request.user.is_authenticated:
+        follows_list = FollowUser.objects.select_related('author').filter(
+            user=request.user).values_list('author__id', flat=True)
+
+    return follows_list
+
+
 def get_shopping_list(request):
     if request.user.is_authenticated:
         buying_list = ShoppingList.objects.select_related('recipe').filter(
@@ -50,27 +63,12 @@ def get_shopping_list(request):
     return buying_list
 
 
-def create_buy(request, recipe_id):
-    recipe = get_object_or_404(Recipe, id=recipe_id)
-    user = request.user
-    obj, created = ShoppingList.objects.get_or_create(
-        defaults={
-            'user': user,
-            'recipe': recipe,
-        },
-        user=user,
-        recipe=recipe,
-    )
-
-    return {'success': bool(created)}
-
-
-def assembly_ingredients(ingredients_names, ingredients_values, recipe, ingredients):
-    """Удаление ингредиентов из поста и установка новых, полученных с request."""
+def assembly_ingredients(ingr_names, ingr_values, recipe, ingredients):
+    # Удаление ингредиентов из поста и установка новых, полученных с request.
     ingredients_list = []
-    if len(ingredients_names):
+    if len(ingr_names):
         ingredients.delete()
-        for n, name in enumerate(ingredients_names):
+        for n, name in enumerate(ingr_names):
             try:
                 ingredient = Ingredient.objects.get(title=name)
             except Ingredient.DoesNotExist:
@@ -78,17 +76,18 @@ def assembly_ingredients(ingredients_names, ingredients_values, recipe, ingredie
             ingr_quan, created = IngredientRecipe.objects.get_or_create(
                 defaults={
                     'ingredient': ingredient,
-                    'amount': ingredients_values[n],
+                    'amount': ingr_values[n],
                     'recipe': recipe,
                 },
                 ingredient=ingredient,
-                amount=ingredients_values[n],
+                amount=ingr_values[n],
                 recipe=recipe,
             )
             ingr_quan.save()
             ingredients_list.append(ingr_quan)
 
     return ingredients_list
+
 
 def create_shopping_list(request):
     recipes = Recipe.objects.filter(
