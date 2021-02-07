@@ -1,0 +1,41 @@
+version: '3.3'
+
+volumes:
+  postgres_data:
+  static_volume:
+  media_volume:
+
+services:
+  db:
+    image: postgres:12.4
+    container_name: postgres
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    env_file:
+      - ./.env
+  web:
+    image: lokteved/foodgram:latest
+    container_name: web
+    restart: always
+    expose:
+     - 8000
+    volumes:
+      - /static_volume:/code/static/
+      - /media_volume:/code/media/
+    depends_on:
+      - db
+    env_file:
+      - ./.env
+  nginx:
+    image: nginx:1.19.5-alpine
+    container_name: nginx
+    volumes:
+      - /static_volume:/code/static/
+      - /media_volume:/code/media/
+      - ./nginx/defaultnginx.conf:/etc/nginx/conf.d/defaultnginx.conf
+    ports:
+      - '80:80'
+    links:
+      - web:web
+    depends_on:
+      - web

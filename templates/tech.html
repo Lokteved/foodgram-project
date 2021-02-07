@@ -1,0 +1,18 @@
+{% extends "base.html"%} 
+{% block title %} О проекте | Продуктовый помощник{% endblock %}
+{% load static %}
+{% block style %}<link rel="stylesheet" href={% static "/pages/index.css" %}>{% endblock %}
+{% block nav %}{% include 'nav.html' %}{% endblock %}
+{% block content %}
+<main class="main container">
+    <div class="main__header">
+        <h1 class="main__title">О проекте</h1>
+    </div>
+    <div class="custom-center-block">
+        <p class="custom-text-block">Продуктовый помощник - онлайн-сервис, где пользователи смогут публиковать рецепты, 
+            подписываться на других пользователей, добавлять понравившиеся рецепты в список «Избранное», 
+            легко скачивать / распечатывать список ингредиентов для рецепта или списка рецептов. Для реализации использованы технологии:
+        Python, Django, PostgreSQL, Docker, Nginx, Javascript</p>
+    </div>
+</main>
+{% endblock %}

@@ -1,0 +1,15 @@
+{% extends "base.html"%} 
+{% block title %} Об авторе | Продуктовый помощник{% endblock %}
+{% load static %}
+{% block style %}<link rel="stylesheet" href={% static "/pages/index.css" %}>{% endblock %}
+{% block nav %}{% include 'nav.html' %}{% endblock %}
+{% block content %}
+<main class="main container">
+    <div class="main__header">
+        <h1 class="main__title">Об авторе</h1>
+    </div>
+    <div class="custom-button-block">
+        <a href='https://github.com/Lokteved' class="button button_style_blue">Github автора</a>
+    </div>
+</main>
+{% endblock %}

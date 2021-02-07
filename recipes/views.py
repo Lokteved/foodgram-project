@@ -147,7 +147,8 @@ def favorite_index(request):
 
 @login_required
 def follows_index(request):
-    followed_authors = User.objects.filter(following__user=request.user)
+    followed_authors = User.objects.filter(
+        following__user=request.user).order_by('username')
     follows_list = get_follows_list(request)
     paginator = Paginator(followed_authors, 3)
     page_number = request.GET.get('page')
