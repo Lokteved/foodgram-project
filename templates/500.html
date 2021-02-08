@@ -2,8 +2,7 @@
 {% block title %}Ошибка 500 | Продуктовый помощник{% endblock %}
 {% load user_filters %}
 {% load static %}
-{% block style %}
-<link rel="stylesheet" href={% static "/pages/index.css" %}>{% endblock %}
+{% block style %}<link rel="stylesheet" href={% static "/pages/index.css" %}>{% endblock %}
 {% block nav %}{% include 'nav.html' %}{% endblock %}
 {% block content %}
 <div class="custom-center-block">
@@ -13,5 +12,4 @@
         <a href={% url 'index' %} class="button button_style_blue">Перейти на главную</a>
     </div>
 </div>
-</main>
 {% endblock %}

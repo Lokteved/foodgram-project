@@ -11,6 +11,7 @@ from .models import (
 
 
 def get_ingredients(request):
+    """Получение списка ингредиентов из запроса"""
     ingredients = {}
     for key in request.POST:
 
@@ -23,11 +24,13 @@ def get_ingredients(request):
 
 
 def get_ingredients_names(request):
+    """Получение списка названий ингредиентов из запроса"""
     ingredients = get_ingredients(request)
     return list(ingredients.keys())
 
 
 def get_ingredients_values(request):
+    """Получение списка количеств ингредиентов из запроса"""
     ingredients = get_ingredients(request)
     return list(ingredients.values())
 
@@ -39,6 +42,7 @@ def get_id_recipe(request):
 
 
 def get_fav_list(request):
+    """Получение списка id избранных рецептов"""
     fav_list = []
     if request.user.is_authenticated:
         fav_list = FollowRecipe.objects.select_related('recipe').filter(
@@ -48,6 +52,8 @@ def get_fav_list(request):
 
 
 def get_follows_list(request):
+    """Получение списка id избранных авторов"""
+    follows_list = []
     if request.user.is_authenticated:
         follows_list = FollowUser.objects.select_related('author').filter(
             user=request.user).values_list('author__id', flat=True)
@@ -56,6 +62,8 @@ def get_follows_list(request):
 
 
 def get_shopping_list(request):
+    """Получение списка id рецептов, добавленных в список покупок"""
+    buying_list = []
     if request.user.is_authenticated:
         buying_list = ShoppingList.objects.select_related('recipe').filter(
             user=request.user).values_list('recipe__id', flat=True)
@@ -64,41 +72,44 @@ def get_shopping_list(request):
 
 
 def assembly_ingredients(ingr_names, ingr_values, recipe, ingredients):
-    # Удаление ингредиентов из поста и установка новых, полученных с request.
+    """Удаление ингредиентов из поста и установка новых, полученных с request."""
     ingredients_list = []
-    if len(ingr_names):
-        ingredients.delete()
-        for n, name in enumerate(ingr_names):
-            try:
-                ingredient = Ingredient.objects.get(title=name)
-            except Ingredient.DoesNotExist:
-                return []
-            ingr_quan, created = IngredientRecipe.objects.get_or_create(
-                defaults={
-                    'ingredient': ingredient,
-                    'amount': ingr_values[n],
-                    'recipe': recipe,
-                },
-                ingredient=ingredient,
-                amount=ingr_values[n],
-                recipe=recipe,
-            )
-            ingr_quan.save()
-            ingredients_list.append(ingr_quan)
+    if not ingr_names:
+        return ingredients_list
+
+    ingredients.delete()
+    for n, name in enumerate(ingr_names):
+        try:
+            ingredient = Ingredient.objects.get(title=name)
+        except Ingredient.DoesNotExist:
+            continue
+        ingr_quan, created = IngredientRecipe.objects.get_or_create(
+            defaults={
+                'ingredient': ingredient,
+                'amount': ingr_values[n],
+                'recipe': recipe,
+            },
+            ingredient=ingredient,
+            amount=ingr_values[n],
+            recipe=recipe,
+        )
+        ingr_quan.save()
+        ingredients_list.append(ingr_quan)
 
     return ingredients_list
 
 
 def create_shopping_list(request):
+    """Создание списка покупок для скачивания"""
     recipes = Recipe.objects.filter(
         recipe_shopping_list__user=request.user
     ).all()
     ingredients = []
-    for recipe in recipes:
-        ingredient_list = IngredientRecipe.objects.filter(recipe=recipe)
-        for i in ingredient_list:
-            new = [i.ingredient.title, i.amount, i.ingredient.dimension]
-            ingredients.append(new)
+    ingredient_list = IngredientRecipe.objects.prefetch_related(
+        'recipe').filter(recipe__in=recipes)
+    for i in ingredient_list:
+        new = [i.ingredient.title, i.amount, i.ingredient.dimension]
+        ingredients.append(new)
     result = {}
     for i in ingredients:
         if not i[0] in result:

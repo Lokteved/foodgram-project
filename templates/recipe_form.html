@@ -33,7 +33,7 @@
                 <div class="form__field-group">
                     {{ form.title|addclass:"form__input" }}
                     {% if form.errors %}
-                        {% for error in form.title.errors %}
+                        {% for error in field.errors %}
                             <span class="form__error">{{ error|escape }}</span>
                         {% endfor %}
                     {% endif %}

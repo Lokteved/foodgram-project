@@ -24,6 +24,7 @@ User = get_user_model()
 
 
 def index(request):
+    """Главная страница"""
     tags_values = request.GET.getlist('filters')
     recipe_list = Recipe.objects.all()
     favorites = False
@@ -50,32 +51,27 @@ def index(request):
 
 @login_required
 def new_recipe(request):
-    if request.method == "POST":
-        form = RecipeForm(request.POST, files=request.FILES or None)
-        ingredients = get_ingredients(request)
-        if not bool(ingredients):
-            form.add_error(None, 'Добавьте ингредиенты')
+    """Страница создания рецепта"""
+    form = RecipeForm(request.POST or None, files=request.FILES or None)
+    ingredients = get_ingredients(request)
 
-        if form.is_valid():
-            recipe = form.save(commit=False)
-            recipe.author = request.user
-            recipe.save()
+    if not form.is_valid():
+        return render(request, 'recipe_form.html', {'form': form})
 
-            for item in ingredients:
-                IngredientRecipe.objects.create(
-                    amount=ingredients[item],
-                    ingredient=Ingredient.objects.get(title=f'{item}'),
-                    recipe=recipe)
-            form.save_m2m()
-            return redirect('index')
-
-    else:
-        form = RecipeForm(request.POST, files=request.FILES or None)
-
-    return render(request, 'recipe_form.html', {'form': form})
+    recipe = form.save(commit=False)
+    recipe.author = request.user
+    recipe.save()
+    for item in ingredients:
+        IngredientRecipe.objects.create(
+            amount=ingredients[item],
+            ingredient=Ingredient.objects.get(title=f'{item}'),
+            recipe=recipe)
+    form.save_m2m()
+    return redirect('index')
 
 
 class RecipeEdit(LoginRequiredMixin, View):
+    """Страница редактирования рецепта"""
     def get(self, request, recipe_id):
         recipe = get_object_or_404(Recipe, id=recipe_id)
         if request.user != recipe.author:
@@ -112,6 +108,7 @@ class RecipeEdit(LoginRequiredMixin, View):
 
 
 class RecipeDelete(LoginRequiredMixin, View):
+    """Удаление рецепта"""
     def get(self, request, recipe_id):
         recipe = get_object_or_404(Recipe, id=recipe_id)
         if request.user != recipe.author:
@@ -123,6 +120,7 @@ class RecipeDelete(LoginRequiredMixin, View):
 
 @login_required
 def favorite_index(request):
+    """Страница избранных рецептов"""
     tags_values = request.GET.getlist('filters')
     recipe_list = Recipe.objects.filter(
         following_recipe__user=request.user
@@ -147,6 +145,7 @@ def favorite_index(request):
 
 @login_required
 def follows_index(request):
+    """Страница избранных авторов"""
     followed_authors = User.objects.filter(
         following__user=request.user).order_by('username')
     follows_list = get_follows_list(request)
@@ -163,6 +162,7 @@ def follows_index(request):
 
 @login_required
 def shopping_list(request):
+    """Страница списка покупок"""
     purchases = Recipe.objects.filter(
         recipe_shopping_list__user=request.user
     ).all()
@@ -175,6 +175,7 @@ def shopping_list(request):
 
 @login_required
 def shopping_list_delete_item(request, recipe_id):
+    """Удаление рецепта из списка покупок"""
     purchase = get_object_or_404(
         ShoppingList,
         user=request.user,
@@ -193,6 +194,7 @@ def shopping_list_delete_item(request, recipe_id):
 
 @login_required
 def download_shopping_list(request):
+    """Загрузка списка покупок"""
     result = create_shopping_list(request)
     filename = 'ShopList.txt'
     response = HttpResponse(result, content_type='text/plain')
@@ -202,6 +204,7 @@ def download_shopping_list(request):
 
 
 def profile(request, username):
+    """Страница автора"""
     tags_values = request.GET.getlist('filters')
     author = get_object_or_404(User, username=username)
     recipe_list = author.recipes.all()
@@ -234,6 +237,7 @@ def profile(request, username):
 
 
 def recipe_view(request, recipe_id):
+    """Страница рецепта"""
     recipe = get_object_or_404(Recipe, id=recipe_id)
     recipe_ingredients = IngredientRecipe.objects.filter(recipe=recipe)
     following = False

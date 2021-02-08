@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth import get_user_model
+from django.core.validators import MinValueValidator
 
 
 User = get_user_model()
@@ -56,7 +57,7 @@ class Recipe(models.Model):
         'date published',
         auto_now_add=True)
 
-    class Meta():
+    class Meta:
         ordering = ('-pub_date',)
 
     def __str__(self):
@@ -72,7 +73,11 @@ class IngredientRecipe(models.Model):
         Ingredient,
         on_delete=models.CASCADE,
         related_name='recipes')
-    amount = models.IntegerField()
+    amount = models.IntegerField(
+        validators=(
+            MinValueValidator(1, message='Значение должно быть больше 1'),
+        )
+    )
 
 
 class FollowRecipe(models.Model):
@@ -84,6 +89,9 @@ class FollowRecipe(models.Model):
         Recipe,
         on_delete=models.CASCADE,
         related_name='following_recipe')
+
+    class Meta:
+        unique_together = [['user', 'recipe']]
 
     def __str__(self):
         return f'follower - {self.user} following recipe - {self.recipe}'
@@ -99,6 +107,9 @@ class FollowUser(models.Model):
         on_delete=models.CASCADE,
         related_name='following')
 
+    class Meta:
+        unique_together = [['user', 'author']]
+
     def __str__(self):
         return f'follower - {self.user} following - {self.author}'
 
@@ -112,3 +123,6 @@ class ShoppingList(models.Model):
         Recipe,
         on_delete=models.CASCADE,
         related_name='recipe_shopping_list')
+
+    class Meta:
+        unique_together = [['user', 'recipe']]

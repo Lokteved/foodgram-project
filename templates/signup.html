@@ -1,27 +1,20 @@
-<!doctype html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport"
-          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Регистрация | Продуктовый помощник</title>
-    {% load static %}
-    {% load user_filters %}
-    <link rel="stylesheet" href="{% static 'pages/form.css' %}">
-</head>
-<body class="body">
-    {% include 'nav.html' %}
+{% extends "base.html"%} 
+{% block title %} Регистрация | Продуктовый помощник{% endblock %}
+{% load static %}
+{% load user_filters %}
+{% block style %}<link rel="stylesheet" href={% static "/pages/form.css" %}>{% endblock %}
+{% block nav %}{% include 'nav.html' %}{% endblock %}
+{% block content %}
 <main class="main container">
     <div class="main__header">
-        <h1 class="main__title">Регистрация</h1>
+        <h1 class="main__title">Регистрация | Продуктовый помощник</h1>
     </div>
     {% if form.errors %}
-    {% for error in form.errors %}
-        <div class="alert alert-danger" role="alert">
-            {{ error|escape }}
-        </div>
-    {% endfor %}
+        {% for error in form.errors %}
+            <div class="alert alert-danger" role="alert">
+                {{ error|escape }}
+            </div>
+        {% endfor %}
     {% endif %}
     <div class="form-container">
         <form method="post" action="{% url 'signup' %}">
@@ -44,9 +37,5 @@
             </div>
         </form>
     </div>
-
-
 </main>
-{% include 'footer.html' %}
-</body>
-</html>
+{% endblock %}

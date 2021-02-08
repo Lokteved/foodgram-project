@@ -2,8 +2,7 @@
 {% block title %}Ошибка 404 | Продуктовый помощник{% endblock %}
 {% load user_filters %}
 {% load static %}
-{% block style %}
-<link rel="stylesheet" href={% static "/pages/index.css" %}>{% endblock %}
+{% block style %}<link rel="stylesheet" href={% static "/pages/index.css" %}>{% endblock %}
 {% block nav %}{% include 'nav.html' %}{% endblock %}
 {% block content %}
 <div class="custom-center-block">
@@ -15,7 +14,4 @@
     </div>
 
 </div>
-
-
-</main>
 {% endblock %}

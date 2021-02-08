@@ -1,6 +1,6 @@
 <div class="card" data-id="{{ recipe.id }}">
     {% if recipe.image %}
-    <a href={% url 'recipe' recipe.id %} class="link" target="_blank"><img src="{{ recipe.image.url }}" alt="{{ recipe.title }}" class="card__image"></a>
+        <a href={% url 'recipe' recipe.id %} class="link" target="_blank"><img src="{{ recipe.image.url }}" alt="{{ recipe.title }}" class="card__image"></a>
     {% endif %}
     <div class="card__body">
         <a class="card__title link" href={% url 'recipe' recipe.id %} target="_blank">{{ recipe.title }}</a>
@@ -15,15 +15,15 @@
         </div>
     </div>
     {% if request.user.is_authenticated %}
-    <div class="card__footer">   
-        {% if not recipe.id in shopping_list %}
-            <button class="button button_style_light-blue" name="purchases" data-out><span class="icon-plus button__icon"></span>Добавить в покупки</button>
-        {% else %}
-            <button class="button button_style_light-blue" name="purchases"><span class="icon-plus button__icon"></span>Рецепт добавлен</button>
-        {% endif %}
-        <button class="button button_style_none" name="favorites"{% if recipe.id not in favorites %}data-out{% endif %}>
-            <span class="icon-favorite {% if recipe.id in favorites %}icon-favorite_active{% endif %}"></span>
-        </button>           
-    </div>
+        <div class="card__footer">   
+            {% if not recipe.id in shopping_list %}
+                <button class="button button_style_light-blue" name="purchases" data-out><span class="icon-plus button__icon"></span>Добавить в покупки</button>
+            {% else %}
+                <button class="button button_style_light-blue" name="purchases"><span class="icon-check button__icon"></span>Рецепт добавлен</button>
+            {% endif %}
+            <button class="button button_style_none" name="favorites"{% if recipe.id not in favorites %}data-out{% endif %}>
+                <span class="icon-favorite {% if recipe.id in favorites %}icon-favorite_active{% endif %}"></span>
+            </button>           
+        </div>
     {% endif %}
 </div>
