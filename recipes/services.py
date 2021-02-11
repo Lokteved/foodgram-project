@@ -1,5 +1,7 @@
 import json
 
+from django.db.models import Sum
+
 from .models import (
     IngredientRecipe,
     FollowRecipe,
@@ -104,25 +106,16 @@ def create_shopping_list(request):
     recipes = Recipe.objects.filter(
         recipe_shopping_list__user=request.user
     ).all()
-    ingredients = []
-    ingredient_list = IngredientRecipe.objects.prefetch_related(
-        'recipe').filter(recipe__in=recipes)
+    result = []
+    ingredient_list = recipes.values(
+        'ingredients__title', 'ingredients__dimension',
+    ).annotate(
+        Sum('recipe_ingredients__amount')).order_by()
     for i in ingredient_list:
-        new = [i.ingredient.title, i.amount, i.ingredient.dimension]
-        ingredients.append(new)
-    result = {}
-    for i in ingredients:
-        if not i[0] in result:
-            result[i[0]] = i[1]
-        else:
-            result[i[0]] += i[1]
-
-    content = []
-    for key, value in result.items():
-        for i in ingredients:
-            if i[0] == key:
-                ing = f'{key} - {value} {i[2]}\n'
-                content.append(ing)
-                break
-
-    return content
+        item = (
+            i.get('ingredients__title'),
+            str(i.get('recipe_ingredients__amount__sum')),
+            i.get('ingredients__dimension')
+        )
+        result += (' '.join(item)) + '\n'
+    return result
