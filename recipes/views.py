@@ -5,6 +5,7 @@ from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 from django.http import HttpResponse
 from django.views import View
+from django.views.generic.base import TemplateView
 
 from .forms import RecipeForm
 from .models import Recipe, IngredientRecipe, Ingredient, ShoppingList
@@ -258,3 +259,11 @@ def recipe_view(request, recipe_id):
             'in_list': in_list
         }
     )
+
+
+class AboutPage(TemplateView):
+    template_name = 'about.html'
+
+
+class TechPage(TemplateView):
+    template_name = 'tech.html'

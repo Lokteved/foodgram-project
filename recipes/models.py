@@ -52,7 +52,11 @@ class Recipe(models.Model):
         through_fields=('recipe', 'ingredient')
     )
     tag = models.ManyToManyField(Tag, related_name='recipe_tag')
-    cooking_time = models.IntegerField()
+    cooking_time = models.IntegerField(
+        validators=(
+            MinValueValidator(0, message='Значение должно быть больше 0'),
+        )
+    )
     pub_date = models.DateTimeField(
         'date published',
         auto_now_add=True)
