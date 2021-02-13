@@ -28,15 +28,15 @@
     <div class="form-container">
         <form class="form" method="post" enctype="multipart/form-data" action="."> 
             {% csrf_token %}
+            {% if form.errors %}
+                {% for error in form.errors %}
+                    <span class="form__error">{{ error|escape }}</span>
+                {% endfor %}
+            {% endif %}
             <div class="form__group">
                 <label for="id_name" class="form__label">Название рецепта</label>
                 <div class="form__field-group">
                     {{ form.title|addclass:"form__input" }}
-                    {% if form.errors %}
-                        {% for error in field.errors %}
-                            <span class="form__error">{{ error|escape }}</span>
-                        {% endfor %}
-                    {% endif %}
                 </div>
             </div>
             <div class="form__group">
